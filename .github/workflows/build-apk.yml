@@ -51,8 +51,16 @@ jobs:
           node --check route.js
           node tests/finance-smoke.test.cjs
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Use preinstalled Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ANDROID_HOME:-}"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          test -x "$SDKMANAGER"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          echo "Android SDK: $ANDROID_HOME"
+          "$SDKMANAGER" --version
 
       - name: Install Android 36 platform and build tools
         shell: bash
